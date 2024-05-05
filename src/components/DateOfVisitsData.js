@@ -1,0 +1,151 @@
+import React, { useEffect, useState } from 'react';
+import CanvasJSReact from '@canvasjs/react-charts';
+//var CanvasJSReact = require('@canvasjs/react-charts');
+ 
+var CanvasJS = CanvasJSReact.CanvasJS;
+var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+
+function DateOfVisitsData() {
+  var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+    const [data, setData] = useState([]);
+    const [getAllFullNames, setgetAllFullNames]=useState([])
+    const [formData, setFormData] = useState({
+        selectedDate: '',
+        selectedOptions: [],
+      });
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        // Fetch data from API using formData.selectedDate and formData.selectedOptions
+        try {
+            fetchData();
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+
+      
+    useEffect(() => {
+        fetchData();
+        fetchhFullNameData();
+      }, []);
+      // Function to handle change in select field
+  const handleDateChange = (e) => {
+    setFormData({
+      ...formData,
+      selectedDate: e.target.value,
+    });
+  };
+
+  // Function to handle change in multiple options
+  const handleOptionsChange = (e) => {
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setFormData({
+      ...formData,
+      selectedOptions: selectedOptions,
+    });
+  };
+
+  const fetchhFullNameData = async () => {
+    const $FullNameDataURL = "http://localhost:3040/api/getAllFullNames";
+    console.log($FullNameDataURL);
+    try {
+        const FullNameDataResponse = await fetch($FullNameDataURL);
+        const jsonFullNameData = await FullNameDataResponse.json();
+        setgetAllFullNames(jsonFullNameData.fullnameOutcome)
+    }
+    catch(error){
+        console.error('Error fetching data:', error);
+    }
+  }
+
+
+      const fetchData = async () => {
+        const $fName = formData.selectedOptions;
+        // const $FYear = "2023";
+        console.log($fName);
+        const $baseUrl = "http://localhost:3040/api/getApiDateOfVisits/"+formData.selectedOptions+"/"+formData.selectedDate;
+        console.log($baseUrl)
+        try {
+          const response = await fetch($baseUrl);
+          
+          const jsonData = await response.json();
+          const jsonDataResult = jsonData.finalData;
+          const itemsData = jsonDataResult.map(item => ({year: item.year, label: months[item.month-1], y: item.count }));        
+          setData(itemsData);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+
+      
+
+    const options = {
+        animationEnabled: true,
+        theme: "light2", //"light2", "dark1", "dark2"
+        title: {
+          text: "PATIENTS VISITS DATA"
+        },
+        toolTip:{
+          content: formData.selectedOptions + ` visited {y} times in {label},` +formData.selectedDate ,
+        },
+        axisY:{
+          interval: 2
+       },
+        data: [
+          {
+            type: "column",
+            dataPoints:  data.map(item => ({ label: item.label, y: item.y }))
+          }
+        ]
+      };
+      const containerProps = {
+        height: "300px",
+        width: "500px"
+      };
+
+    return (
+        <div>
+            <div>
+            <form onSubmit={handleSubmit}>
+        <div className='mb-2'>
+          <label htmlFor="date">Select Date:</label>
+          {/* <input
+            type="date" className='border-2 border-black '
+            id="date" min="2023-01-01" max="2025-01-01"
+            value={formData.selectedDate}
+            onChange={handleDateChange}
+          /> */}
+          <select 
+            id="date"
+            value={formData.selectedDate}
+            onChange={handleDateChange}>
+              <option>2023</option>
+              <option>2024</option>
+            </select>
+        </div>
+        <div className='mb-2'>
+          <label htmlFor="options">Select Options:</label>
+          <select className='border-2 border-black '
+            id="options"            
+            value={formData.selectedOptions}
+            onChange={handleOptionsChange}
+          >
+            <option value=" ">Select Option</option>
+            {getAllFullNames.map(item => ( 
+                <option value={item}>{item}</option>
+            ))}
+          </select>
+        </div>
+        <button type="submit" className=' px-6 py-3 bg-black text-white cursor-pointer rounded-md'>Submit</button>
+      </form>
+            </div>
+            <CanvasJSChart containerProps={containerProps} options={options} />
+        </div>
+    );
+}
+
+export default DateOfVisitsData
