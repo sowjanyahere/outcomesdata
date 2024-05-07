@@ -8,7 +8,10 @@ import GeneratePatientReport from './components/GeneratePatientReport';
 import { BrowserRouter as Router, Route,  Routes } from 'react-router-dom';
 import LenghtOfTreatment from './components/LenghtOfTreatment';
 import CombinedChart from './components/CombinedChart';
-import  DisciplineType from './components/DisciplineType'
+import  DisciplineType from './components/DisciplineType';
+import FacilityNameDetails from './components/FacilityNameDetails'
+
+
 function App() {
   return (
     <Router>
@@ -16,13 +19,15 @@ function App() {
      <div>
       <Navbar/>
       <Routes>
-          <Route path="/patient-data" element={<Patients/>} />
+          {/* <Route path="/patient-data" element={<Patients/>} />
           <Route path="/financial-data" element={<FinancialClass/>} />
           <Route path="/goal-type-data" element={<GoalType/>} />
           <Route path="/DateOfVisits" element={<DateOfVisits/>} /> 
           <Route path="/genaratepatientreport" element={<GeneratePatientReport/>} /> 
           <Route path="/LenghtOfTreatment" element={<LenghtOfTreatment/>} /> 
-          <Route path="/CombinedChart" element={<CombinedChart/>} />
+          <Route path="/CombinedChart" element={<CombinedChart/>} /> */}
+          
+          <Route path="/FacilityNameDetails" element={<FacilityNameDetails/>} />
           <Route path="/DisciplineType" element={<DisciplineType/>} />
       </Routes>
       

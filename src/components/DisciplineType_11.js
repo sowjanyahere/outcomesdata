@@ -5,11 +5,15 @@ import CanvasJSReact from "@canvasjs/react-charts";
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
+
 function DisciplineType() {
   const [chartDisplayData, setchartDisplayData] = useState([]);
   const [year, setYear] = useState('');
-  const [getyear,setgetyear] = useState('');
-  const [alldisciplineTypeDataUrl , setAlldisciplineTypeDataUrl] = useState(" ")
+  const [selectedYear, setselectedYear] = useState('');
+  
+  const $AlldisciplineTypeDataUrl =
+    `http://localhost:3040/api/getAlldisciplineTypeData/${selectedYear}`;
+
   let colorCode = {
     PT: "Red",
     OT: "Yellow",
@@ -19,19 +23,11 @@ function DisciplineType() {
 
   let disciplineTypeMap , lineTypeMap = {};
   let subObject = {};
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {  
-      let yearData = year;
-      
-      console.log("yearData "+ yearData);
-      generatingURL(yearData)
-      
-      // fetchDisciplineTypeData(alldisciplineTypeDataUrl);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+  const handleButtonClick = async () => {
+    if (year !== '') {
+      setselectedYear(year);
+    } else {
+      console.log('Please select a year.');
     }
   };
 
@@ -53,16 +49,10 @@ function DisciplineType() {
     ],
   };
 
-  const generatingURL= (yearData)=> {
-      const generateURL = "http://localhost:3040/api/getAlldisciplineTypeData/"+yearData;
-      setAlldisciplineTypeDataUrl(generateURL); 
-  }
-
-  useEffect(() => {  
-    const fetchDisciplineTypeData = async (alldisciplineTypeDataUrl) => {
+  useEffect(() => {
+    const fetchDisciplineTypeData = async () => {
       try {
-        console.log("alldisciplineTypeDataUrl "+alldisciplineTypeDataUrl);
-        const response = await fetch(alldisciplineTypeDataUrl);
+        const response = await fetch($AlldisciplineTypeDataUrl);
         const disciplineTypeListjsonData = await response.json();
         const disciplineTypeListjsonDataResult =
           disciplineTypeListjsonData.getAlldisciplineTypeDataList;
@@ -73,7 +63,7 @@ function DisciplineType() {
           lineTypeMap={};
           jsonAllDisciplineTypeDataResult.forEach((rowData) => {
             disciplineTypeMap[rowData._id] = [];
-            // console.log(rowData._id);
+            console.log(rowData._id);
           });
         disciplineTypeListjsonDataResults.forEach((data) => {
           let getKeyArray = disciplineTypeMap[data.disciplines.type]; // disciplineTypeMap["PT"] == []
@@ -106,7 +96,7 @@ function DisciplineType() {
               yValueFormatString: '#,##',
               dataPoints: disciplineTypeMap[key],
             }),
-            // console.log(subObject),
+            console.log(subObject),
             chartDisplayData.push(subObject)
           )
         );
@@ -118,7 +108,7 @@ function DisciplineType() {
               y: lineTypeMap[key],
               x: new Date( key.split(" ")[1] ,key.split(" ")[0] )
             },
-            // console.log(lineDataPoints),
+            console.log(lineDataPoints),
             lineDisplayObjectArray.push(lineDataPoints)
           )
         );
@@ -130,15 +120,15 @@ function DisciplineType() {
         
   
         setchartDisplayData(chartDisplayData);
-        console.log("chartDisplayData "+chartDisplayData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    };  
-    fetchDisciplineTypeData(alldisciplineTypeDataUrl);
-  },[alldisciplineTypeDataUrl]);
+    };
+    fetchDisciplineTypeData();
+  },[handleButtonClick]);
+ 
 
-  
+  console.log("chartDisplayData " + chartDisplayData);
 
   const options = {
     animationEnabled: true,
@@ -168,7 +158,7 @@ function DisciplineType() {
   return (
     <>
       <h1>DisciplineType</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => { e.preventDefault(); }}>
         <div>
           <label htmlFor="date">Select Date:</label>
           <select
@@ -184,13 +174,14 @@ function DisciplineType() {
           </select>
         </div>
         <button
-          type="submit"
+          type="button" onClick={handleButtonClick}
           className=" px-6 mt-2 py-3 bg-black text-white cursor-pointer rounded-md"
         >
           Submit
         </button>
       </form>
       <div className="mt-2">
+        
         {chartDisplayData && <CanvasJSChart options={options} />}
       </div>
       
