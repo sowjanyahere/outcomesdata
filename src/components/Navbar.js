@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function Navbar() {
   return (
     <ul>
-        {/* <li>
+        <li>
           <Link to="/patient-data">Patient Data</Link>
         </li>
         <li>
@@ -24,13 +24,20 @@ function Navbar() {
         </li>
         <li>
           <Link to="/CombinedChart">CombinedChart</Link>        
-        </li> */}
+        </li>
         <li>
           <Link to="/FacilityNameDetails">FacilityNameDetails</Link>
         </li>
         <li>
           <Link to="/DisciplineType">DisciplineType</Link>
         </li>
+        <li>
+          <Link to="/GenerateDuplicateGoalData">GenerateDuplicateGoalData</Link>
+        </li>
+        <li>
+          <Link to="/ConcurrentlyDisciplinesDataChart">ConcurrentlyDisciplinesDataChart</Link>
+        </li>
+        
     </ul>
     
   )
